@@ -2,7 +2,7 @@
 
 import path from "node:path"
 import fs from "node:fs"
-import { app } from "electron"
+import { app, desktopCapturer } from "electron"
 import { v4 as uuidv4 } from "uuid"
 import screenshot from "screenshot-desktop"
 
@@ -146,5 +146,70 @@ export class ScreenshotHelper {
       console.error("Error deleting file:", error)
       return { success: false, error: error.message }
     }
+  }
+
+  // Real-time screen capture methods
+  public async getScreenSources(): Promise<Electron.DesktopCapturerSource[]> {
+    try {
+      const sources = await desktopCapturer.getSources({
+        types: ['screen', 'window'],
+        thumbnailSize: { width: 150, height: 150 }
+      })
+      return sources
+    } catch (error) {
+      console.error("Error getting screen sources:", error)
+      throw error
+    }
+  }
+
+  public async startScreenCapture(sourceId: string): Promise<MediaStream> {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          // @ts-ignore - Electron specific constraint
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            chromeMediaSourceId: sourceId,
+            minWidth: 1280,
+            maxWidth: 1920,
+            minHeight: 720,
+            maxHeight: 1080
+          }
+        }
+      })
+      return stream
+    } catch (error) {
+      console.error("Error starting screen capture:", error)
+      throw error
+    }
+  }
+
+  public async captureFrameFromStream(stream: MediaStream): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video')
+      video.srcObject = stream
+      video.play()
+
+      video.onloadedmetadata = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = video.videoWidth
+        canvas.height = video.videoHeight
+        
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Could not get canvas context'))
+          return
+        }
+
+        ctx.drawImage(video, 0, 0)
+        const dataURL = canvas.toDataURL('image/png')
+        resolve(dataURL)
+      }
+
+      video.onerror = (error) => {
+        reject(error)
+      }
+    })
   }
 }

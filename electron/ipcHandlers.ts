@@ -103,6 +103,16 @@ export function initializeIpcHandlers(appState: AppState): void {
     }
   })
 
+  ipcMain.handle("analyze-image-base64", async (event, base64Data: string) => {
+    try {
+      const result = await appState.processingHelper.getLLMHelper().analyzeImageBase64(base64Data)
+      return result
+    } catch (error: any) {
+      console.error("Error in analyze-image-base64 handler:", error)
+      throw error
+    }
+  })
+
   ipcMain.handle("gemini-chat", async (event, message: string) => {
     try {
       const result = await appState.processingHelper.getLLMHelper().chatWithGemini(message);
@@ -136,5 +146,35 @@ export function initializeIpcHandlers(appState: AppState): void {
 
   ipcMain.handle("center-and-show-window", async () => {
     appState.centerAndShowWindow()
+  })
+
+  // Real-time screen capture handlers
+  ipcMain.handle("get-screen-sources", async () => {
+    try {
+      return await appState.getScreenshotHelper().getScreenSources()
+    } catch (error) {
+      console.error("Error getting screen sources:", error)
+      throw error
+    }
+  })
+
+  ipcMain.handle("start-screen-capture", async (event, sourceId: string) => {
+    try {
+      const stream = await appState.getScreenshotHelper().startScreenCapture(sourceId)
+      return { success: true, streamId: sourceId }
+    } catch (error) {
+      console.error("Error starting screen capture:", error)
+      throw error
+    }
+  })
+
+  ipcMain.handle("capture-frame-from-stream", async (event, streamId: string) => {
+    try {
+      // This will be handled in the renderer process
+      return { success: true }
+    } catch (error) {
+      console.error("Error capturing frame from stream:", error)
+      throw error
+    }
   })
 }

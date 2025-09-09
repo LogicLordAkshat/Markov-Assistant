@@ -35,6 +35,11 @@ interface ElectronAPI {
   analyzeImageFile: (path: string) => Promise<void>
   quitApp: () => Promise<void>
   invoke: (channel: string, ...args: any[]) => Promise<any>
+  
+  // Real-time screen capture APIs
+  getScreenSources: () => Promise<Electron.DesktopCapturerSource[]>
+  startScreenCapture: (sourceId: string) => Promise<{ success: boolean; streamId: string }>
+  captureFrameFromStream: (streamId: string) => Promise<{ success: boolean }>
 }
 
 export const PROCESSING_EVENTS = {
@@ -171,5 +176,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
   analyzeAudioFile: (path: string) => ipcRenderer.invoke("analyze-audio-file", path),
   analyzeImageFile: (path: string) => ipcRenderer.invoke("analyze-image-file", path),
   quitApp: () => ipcRenderer.invoke("quit-app"),
-  invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args)
+  invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),
+  
+  // Real-time screen capture APIs
+  getScreenSources: () => ipcRenderer.invoke("get-screen-sources"),
+  startScreenCapture: (sourceId: string) => ipcRenderer.invoke("start-screen-capture", sourceId),
+  captureFrameFromStream: (streamId: string) => ipcRenderer.invoke("capture-frame-from-stream", streamId)
 } as ElectronAPI)

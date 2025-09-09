@@ -1,5 +1,5 @@
 {
-  "name": "interview-coder",
+  "name": "markov-assistant",
   "version": "1.0.0",
   "main": "./dist-electron/main.js",
   "scripts": {
@@ -8,13 +8,13 @@
     "build": "npm run clean && tsc && vite build",
     "preview": "vite preview",
     "electron:dev": "tsc -p electron/tsconfig.json && electron .",
-    "app:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && cross-env electron .\"",
+    "app:dev": "concurrently \"vite\" \"wait-on http://localhost:5180 && cross-env NODE_ENV=development electron .\"",
     "app:build": "npm run build && electron-builder",
     "watch": "tsc -p electron/tsconfig.json --watch"
   },
   "build": {
-    "appId": "com.electron.interview-coder",
-    "productName": "Interview Coder",
+    "appId": "com.electron.markov-assistant",
+    "productName": "Markov Assistant",
     "files": [
       "dist/**/*",
       "dist-electron/**/*",

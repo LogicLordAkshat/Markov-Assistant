@@ -7,7 +7,7 @@ export class LLMHelper {
 
   constructor(apiKey: string) {
     const genAI = new GoogleGenerativeAI(apiKey)
-    this.model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
+    this.model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
   }
 
   private async fileToGenerativePart(imagePath: string) {
@@ -149,7 +149,7 @@ export class LLMHelper {
           mimeType: "image/png"
         }
       };
-      const prompt = `${this.systemPrompt}\n\nDescribe the content of this image in a short, concise answer. In addition to your main answer, suggest several possible actions or responses the user could take next based on the image. Do not return a structured JSON object, just answer naturally as you would to a user. Be concise and brief.`;
+      const prompt = `${this.systemPrompt}\n\nAnalyze this image and provide a helpful response. Format your answer with:\n\n**What I see:** A brief description of the image content\n\n**Analysis:** Your insights about what's happening\n\n**Suggested actions:**\n- First action or response\n- Second action or response\n- Third action or response\n\nKeep it concise but well-structured for easy reading.`;
       const result = await this.model.generateContent([prompt, imagePart]);
       const response = await result.response;
       const text = response.text();
@@ -160,9 +160,29 @@ export class LLMHelper {
     }
   }
 
+  public async analyzeImageBase64(base64Data: string) {
+    try {
+      const imagePart = {
+        inlineData: {
+          data: base64Data,
+          mimeType: "image/png"
+        }
+      };
+      const prompt = `${this.systemPrompt}\n\nDescribe the content of this image in a short, concise answer. In addition to your main answer, suggest several possible actions or responses the user could take next based on the image. Do not return a structured JSON object, just answer naturally as you would to a user. Be concise and brief.`;
+      const result = await this.model.generateContent([prompt, imagePart]);
+      const response = await result.response;
+      const text = response.text();
+      return { text, timestamp: Date.now() };
+    } catch (error) {
+      console.error("Error analyzing base64 image:", error);
+      throw error;
+    }
+  }
+
   public async chatWithGemini(message: string): Promise<string> {
     try {
-      const result = await this.model.generateContent(message);
+      const prompt = `You are Wingman AI, a helpful assistant. When responding, use clear formatting:\n\n- Use **bold text** for important points\n- Use bullet points (-) for lists\n- Use numbered lists (1., 2., 3.) for steps\n- Use \`code\` for technical terms\n- Keep responses well-structured and easy to read\n\nUser message: ${message}`;
+      const result = await this.model.generateContent(prompt);
       const response = await result.response;
       return response.text();
     } catch (error) {

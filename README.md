@@ -1,6 +1,6 @@
-# Free Cluely
+# Markov Assistant
 
-An undetectable desktop application to help you cheat on everything and gives you the answers you didn't study for. 
+An intelligent desktop application that provides AI-powered assistance for coding, problem-solving, and productivity tasks. 
 
 # Sponsored by Recall AI - API for desktop recording
 If you’re looking for a hosted desktop recording API, consider checking out [Recall.ai](https://www.recall.ai/product/desktop-recording-sdk?utm_source=github&utm_medium=sponsorship&utm_campaign=prat011-free-cluely), an API that records Zoom, Google Meet, Microsoft Teams, in-person meetings, and more.
@@ -56,7 +56,7 @@ The built app will be in the `release` folder.
 
 1. **Closing the App**: 
    - Press `Cmd + Q` (Mac) or `Ctrl + Q` (Windows/Linux) to quit
-   - Or use Activity Monitor/Task Manager to close `Interview Coder`
+   - Or use Activity Monitor/Task Manager to close `Markov Assistant`
    - The X button currently doesn't work (known issue)
 
 2. **If the app doesn't start**:
